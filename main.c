@@ -27,24 +27,24 @@ typedef struct Score
 } Score;
 
 // 函数声明
-void _initStudent();
+void _initStudent(); // 初始化链表
 void _initScore();
-void _analysisStudentStr(char *str, Student *index);
+void _analysisStudentStr(char *str, Student *index); // 解析文件中单行字符串，将其按格式存储到内存结构体变量中
 void _analysisScoreStr(char *str, Score *index);
-void _init();
-void _destroyStudent(Student *index);
+void _init();                         // 将文件中的数据按一定格式读取到内存中，用结构体链表存储
+void _destroyStudent(Student *index); // 释放结构体链表所占内存空间
 void _destroyScore(Score *index);
-void _quit();
-void appendStudent(Student index);
+void _quit();                      // 释放内存，将结构体链表中的数据存储到文件中
+void appendStudent(Student index); // 结构体链表尾插
 void appendScore(Score index);
-int convertNum(char *index);
-void counGeneraAndFinalScore(Score *index);
-void save();
-Student *studentSearchById(int id);
-Student *studentSearchByRoomNum(char *roomNum);
-Score *scoreSearchById(int id);
+int convertNum(char *index);                    // 将数字字符串转换为数字
+void countGeneraAndFinalScore(Score *index);    // 计算出综合分数和使得学分
+void save();                                    // 将结构体链表中的数据存储到文件中
+Student *studentSearchById(int id);             // 通过学号查找相对应学生的信息，返回链表中相对应结构体节点的地址
+Student *studentSearchByRoomNum(char *roomNum); // 通过宿舍号码查找相对应学生的信息，返回一个存储相应学生信息的新链表
+Score *scoreSearchById(int id);                 // 通过学号查找相对应学生的成绩信息，返回一个存储相应成绩信息的新链表
 void deleteById(int id);
-void sortByScore(int isReversed);
+void sortByScore(int isReversed); // 将链表中的保存学生成绩的节点，按综合成绩排序
 
 // 全局变量
 Student *pStudent = NULL;
@@ -194,7 +194,7 @@ void _analysisScoreStr(char *str, Score *index)
     index->paperScore = convertNum(tempStr);
 
     // genera and finalScore
-    counGeneraAndFinalScore(index);
+    countGeneraAndFinalScore(index);
 }
 
 void _destroyStudent(Student *index)
@@ -249,7 +249,7 @@ int convertNum(char *index)
     return num;
 }
 
-void counGeneraAndFinalScore(Score *index)
+void countGeneraAndFinalScore(Score *index)
 {
 
     if (index->experimentScore == -1)
@@ -405,7 +405,7 @@ Score *scoreSearchById(int id)
             pResultTemp->next->experimentScore = pTemp->experimentScore;
             pResultTemp->next->paperScore = pTemp->paperScore;
             pResultTemp->next->generalScore = pTemp->generalScore;
-            pResultTemp->next->generalScore = pTemp->generalScore;
+            pResultTemp->next->finalScore = pTemp->finalScore;
             pResultTemp = pResultTemp->next;
         }
         pTemp = pTemp->next;
@@ -496,25 +496,184 @@ void sortByScore(int isReversed)
     }
 }
 
+void type()
+{
+    Score temp;
+    char tempStr1[10];
+    char tempStr2[20];
+
+    printf("学号: ");
+    scanf("%d", &temp.id);
+
+    printf("课程编号: ");
+    scanf("%s", tempStr1);
+    temp.courseNum = (char *)malloc(sizeof(strlen(tempStr1)) + 1);
+    strcpy(temp.courseNum, tempStr1);
+
+    printf("课程名称: ");
+    scanf("%s", tempStr2);
+    temp.courseName = (char *)malloc(sizeof(strlen(tempStr2)) + 1);
+    strcpy(temp.courseName, tempStr2);
+
+    printf("学分: ");
+    scanf("%d", &temp.credit);
+
+    printf("平时成绩: ");
+    scanf("%d", &temp.usualScore);
+
+    printf("实验成绩: ");
+    scanf("%d", &temp.experimentScore);
+
+    printf("卷面成绩: ");
+    scanf("%d", &temp.paperScore);
+
+    countGeneraAndFinalScore(&temp);
+
+    appendScore(temp);
+}
+
+void showStudentInfo(Student *index)
+{
+    printf("\n学号: %d\n", index->id);
+    printf("姓名: %s\n", index->name);
+    printf("性别: %s\n", index->gender);
+    printf("宿舍号码: %s\n", index->roomNum);
+    printf("电话号码: %s\n", index->phoneNum);
+}
+
+void showScoreInfo(Score *index)
+{
+    printf("\n课程编号: %s\n", index->courseNum);
+    printf("课程名称: %s\n", index->courseName);
+    printf("学分 : %d\n", index->credit);
+    printf("平时成绩 : %d\n", index->usualScore);
+    printf("实验成绩 : %d\n", index->experimentScore);
+    printf("卷面成绩  : %d\n", index->paperScore);
+    printf("综合成绩  : %.2f\n", index->generalScore);
+    printf("实得学分 : %.2f\n", index->finalScore);
+}
+
+void showScore()
+{
+    Score *pTemp = pScore->next;
+    while (pTemp)
+    {
+        printf("\n学号: %d", pTemp->id);
+        showScoreInfo(pTemp);
+        pTemp = pTemp->next;
+    }
+}
+
+void search()
+{
+    int choice = -1;
+    int num;
+    char tempStr[30];
+    printf("\n-------------查询------------\n");
+    printf("  1. 学号查询学生信息\n");
+    printf("  2. 宿舍号查询学生信息\n");
+    printf("  3. 学号查询成绩信息\n");
+    printf("----------------------------\n");
+    printf("您的选择: ");
+    scanf("%d", &choice);
+
+    switch (choice)
+    {
+    case 1:
+        printf("学号: ");
+        scanf("%d", &num);
+        Student *pResult = studentSearchById(num);
+        if (pResult)
+            showStudentInfo(pResult);
+        break;
+    case 2:
+        printf("宿舍号: ");
+        scanf("%s", tempStr);
+        Student *pResult1 = studentSearchByRoomNum(tempStr);
+        Student *pTemp1 = pResult1;
+        if (pResult1)
+        {
+            while (pResult1->next)
+            {
+                showStudentInfo(pResult1->next);
+                pResult1 = pResult1->next;
+            }
+            _destroyStudent(pTemp1);
+        }
+        break;
+    case 3:
+        printf("学号: ");
+        scanf("%d", &num);
+
+        Student *pResult3 = studentSearchById(num);
+        if (pResult3)
+            printf("姓名: %s\n", pResult3->name);
+
+        Score *pResult2 = scoreSearchById(num);
+        Score *pTemp2 = pResult2;
+        if (pResult2)
+        {
+            while (pResult2->next)
+            {
+                showScoreInfo(pResult2->next);
+                pResult2 = pResult2->next;
+            }
+            _destroyScore(pTemp2);
+        }
+        break;
+    default:
+        printf("错误的选择!\n");
+        break;
+    }
+}
+
+void show()
+{
+    int choice = -1;
+    int num;
+    printf("      欢迎来到学生管理系统!     \n\n");
+    while (choice != 5)
+    {
+        printf("\n-----------功能菜单----------\n");
+        printf("  1. 录入学生成绩数据\n");
+        printf("  2. 查询\n");
+        printf("  3. 删除\n");
+        printf("  4. 排序并显示\n");
+        printf("  5. 保存并退出\n");
+        printf("---------------------------\n");
+        printf("请输入您的选择: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+        case 1:
+            type();
+            break;
+        case 2:
+            search();
+            break;
+        case 3:
+            printf("学号: ");
+            scanf("%d", &num);
+            deleteById(num);
+            break;
+        case 4:
+            sortByScore(1);
+            showScore();
+            break;
+        case 5:
+            break;
+        default:
+            printf("错误的选择!\n\n");
+            break;
+        }
+    }
+}
+
 int main()
 {
     _init();
-    sortByScore(0);
-    //deleteById(1);
-    /*Student *p1 = studentSearchById(2);
-    printf("id: %d\n", p1->id);
-    Student *p2 = studentSearchByRoomNum("101")->next;
-    while (p2)
-    {
-        printf("%s\n", p2->roomNum);
-        p2 = p2->next;
-    }*/
-    Score *p = scoreSearchById(1)->next;
-    while (p)
-    {
-        printf("id: %d\n", p->id);
-        p = p->next;
-    }
+    show();
 
     _quit();
     return 0;
