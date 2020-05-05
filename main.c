@@ -45,6 +45,12 @@ Student *studentSearchByRoomNum(char *roomNum); // 通过宿舍号码查找相�
 Score *scoreSearchById(int id);                 // 通过学号查找相对应学生的成绩信息，返回一个存储相应成绩信息的新链表
 void deleteById(int id);
 void sortByScore(int isReversed); // 将链表中的保存学生成绩的节点，按综合成绩排序
+void show();                      // 显示命令行用户交互界面
+void search();                    // 根据相应要求搜索学生信息和成绩信息
+void showScore();                 // 显示所有学生成绩
+void showScoreInfo();             // 显示单个学生成绩信息
+void showStudentInfo();           // 显示单个学生信息
+void type();                      // 命令行录入信息模块
 
 // 全局变量
 Student *pStudent = NULL;
@@ -204,13 +210,25 @@ void _destroyStudent(Student *index)
     {
         pTemp = index->next;
         if (index->name)
+        {
             free(index->name);
+            index->name = NULL;
+        }
         if (index->gender)
+        {
             free(index->gender);
+            index->gender = NULL;
+        }
         if (index->roomNum)
+        {
             free(index->roomNum);
+            index->roomNum = NULL;
+        }
         if (index->phoneNum)
+        {
             free(index->phoneNum);
+            index->phoneNum = NULL;
+        }
         free(index);
         index = pTemp;
     }
@@ -374,10 +392,16 @@ Student *studentSearchByRoomNum(char *roomNum)
         {
             pResultTemp->next = (Student *)malloc(sizeof(Student));
             pResultTemp->next->id = pTemp->id;
-            pResultTemp->next->name = pTemp->name;
-            pResultTemp->next->gender = pTemp->gender;
-            pResultTemp->next->roomNum = pTemp->roomNum;
-            pResultTemp->next->phoneNum = pTemp->phoneNum;
+            pResultTemp->next->name = (char *)malloc(sizeof(char) * strlen(pTemp->name) + 1);
+            strcpy(pResultTemp->next->name, pTemp->name);
+            pResultTemp->next->gender = (char *)malloc(sizeof(char) * strlen(pTemp->gender) + 1);
+            strcpy(pResultTemp->next->name, pTemp->name);
+            pResultTemp->next->gender = (char *)malloc(sizeof(char) * strlen(pTemp->gender) + 1);
+            strcpy(pResultTemp->next->name, pTemp->name);
+            pResultTemp->next->roomNum = (char *)malloc(sizeof(char) * strlen(pTemp->roomNum) + 1);
+            strcpy(pResultTemp->next->roomNum, pTemp->roomNum);
+            pResultTemp->next->phoneNum = (char *)malloc(sizeof(char) * strlen(pTemp->phoneNum) + 1);
+            strcpy(pResultTemp->next->phoneNum, pTemp->phoneNum);
             pResultTemp->next->next = NULL;
             pResultTemp = pResultTemp->next;
         }
@@ -398,8 +422,10 @@ Score *scoreSearchById(int id)
         {
             pResultTemp->next = (Score *)malloc(sizeof(Score));
             pResultTemp->next->id = pTemp->id;
-            pResultTemp->next->courseNum = pTemp->courseNum;
-            pResultTemp->next->courseName = pTemp->courseName;
+            pResultTemp->next->courseNum = (char *)malloc(sizeof(char) * strlen(pTemp->courseNum) + 1);
+            strcpy(pResultTemp->next->courseNum, pTemp->courseNum);
+            pResultTemp->next->courseName = (char *)malloc(sizeof(char) * strlen(pTemp->courseName) + 1);
+            strcpy(pResultTemp->next->courseName, pTemp->courseName);
             pResultTemp->next->credit = pTemp->credit;
             pResultTemp->next->usualScore = pTemp->usualScore;
             pResultTemp->next->experimentScore = pTemp->experimentScore;
@@ -509,11 +535,13 @@ void type()
     scanf("%s", tempStr1);
     temp.courseNum = (char *)malloc(sizeof(strlen(tempStr1)) + 1);
     strcpy(temp.courseNum, tempStr1);
+    temp.courseNum[sizeof(strlen(tempStr1))] = '\0';
 
     printf("课程名称: ");
     scanf("%s", tempStr2);
     temp.courseName = (char *)malloc(sizeof(strlen(tempStr2)) + 1);
     strcpy(temp.courseName, tempStr2);
+    temp.courseName[sizeof(strlen(tempStr2))] = '\0';
 
     printf("学分: ");
     scanf("%d", &temp.credit);
@@ -674,7 +702,6 @@ int main()
 {
     _init();
     show();
-
     _quit();
     return 0;
 }
