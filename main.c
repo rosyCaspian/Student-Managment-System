@@ -56,6 +56,15 @@ void type();                      // 命令行录入信息模块
 Student *pStudent = NULL;
 Score *pScore = NULL;
 
+// 主函数
+int main()
+{
+    _init();
+    show();
+    _quit();
+    return 0;
+}
+
 void _initStudent()
 {
     pStudent = (Student *)malloc(sizeof(Student));
@@ -696,12 +705,4 @@ void show()
             break;
         }
     }
-}
-
-int main()
-{
-    _init();
-    show();
-    _quit();
-    return 0;
 }
